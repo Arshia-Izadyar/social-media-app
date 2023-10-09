@@ -1,0 +1,75 @@
+version: "3.7"
+
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      POSTGRES_USER: arshia
+      POSTGRES_PASSWORD: a123
+      POSTGRES_DB: twitter
+      PGDATA: /data/postgres
+    volumes:
+      - "postgres:/data/postgres"
+    ports:
+      - "5432:5432"
+    networks:
+      - dj_network
+    restart: unless-stopped
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_container
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: a123
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "8090:80"
+    networks:
+      - dj_network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+  redis:
+    image: redis:latest
+    container_name: redis_container
+    # command: ["redis-server", "/etc/redis/redis.conf"]
+    volumes:
+      # - ./redis/redis.conf:/etc/redis/redis.conf
+      - redis:/etc/redis
+    ports:
+      - "6379:6379"
+    networks:
+      - dj_network
+
+  python_app:
+    build: .
+    image: python
+    command: bash -c "python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"
+    container_name: python_app_container
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+    networks:
+      - dj_network
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: twitter
+      POSTGRES_USER: arshia
+      POSTGRES_PASSWORD: a123
+    volumes:
+      - .:/app
+
+volumes:
+  postgres:
+  pgadmin:
+  redis:
+  
+
+networks:
+  dj_network:
+    driver: bridge
