@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}
+Comment detail
+{% endblock title %}    
+
+{% block body %}
+
+<h3>{{tweet.author}} - {{tweet.created_at}}</h3>
+<h3>{{tweet.content}}</h3>
+<p>{{like_count}}</p>
+
+<form method="post" action="/like/">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.path }}">
+    <input type="hidden" name="tweet" value="{{tweet.pk}}">
+    <input type="submit" value="like">
+</form>
+
+
+<form method="post" action="/comment/" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{comment_form.as_p}}
+    <input type="hidden" name="next" value="{{ request.path }}">
+    <input type="hidden" name="tweet" value="{{tweet.pk}}">
+    <input type="submit" value="Comment">
+</form>
+
+
+
+    {% for comment in tweet_comments %}
+        <div class="comment">
+            {% if not comment.parent_comment %}
+            <h3>{{ comment.author }} - {{ comment.created_at }}</h3>
+            <h3>{{ comment.content }}</h3>
+                {% if comment.image %}
+                    <img src={{comment.image.url}} style="max-width:200px;max-height:200px">
+                
+                {% elif comment.video %}
+                    <video width="200" height="200" controls>
+                        <source src={{comment.video.url}} type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                {% endif %}
+                
+                <form method="post" action="/comment/" enctype="multipart/form-data" style="display: inline-block;">
+                    {% csrf_token %}
+                    <div style="display: inline-block;">
+                        {{comment_form.as_div}}</div>
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <input type="hidden" name="parent_comment" value="{{ comment.id }}">
+                        <input type="hidden" name="tweet" value="{{tweet.pk}}">
+                        <input type="submit" value="Comment">
+                    
+                </form>
+
+            {% endif %}
+              
+            {% if comment.replies.all %}
+                <div class="nested-replies">
+                    {% for reply in comment.replies.all %}
+                        <div class="reply">
+                            <h3>reply to {{comment.author}}</h3>
+                            <h3>{{ reply.author }} - {{ reply.created_at }} </h3>
+                            <p>{{ reply.content }}</p>
+                            {% if reply.image %}
+                             <img src={{reply.image.url}} style="max-width:200px;max-height:200px">
+                
+                            {% elif reply.video %}
+                                <video width="200" height="200" controls>
+                                    <source src={{reply.video.url}} type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+
+{% endblock body %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home
+{% endblock title %}    
+
+{% block body %}
+<h1>Home of {{user}}</h1>
+
+{% for tweet in tweets %}
+<div class="tweet">
+    <h3>{{tweet.author}} - {{tweet.created_at}}</h3>
+    <a href= {% url "detail" tweet.author tweet.id  %}> <h3>{{tweet.content}}</h3> </a>
+    <p>Comments: {{tweet.comments.count}}</p>
+    <p>Likes: {{tweet.like_count}}</p>
+    {% if tweet.image %}
+    <img src={{tweet.image.url}} style="max-width:200px;max-height:200px">
+    {% elif tweet.video %}
+    <video width="640" height="360" controls>
+        <source src={{tweet.video.url}} type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    {% endif %}
+
+    <p></p>
+
+    <form method="post" action="/like/" id="like-form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <input type="hidden" name="tweet" value="{{tweet.pk}}">
+        <input type="submit" value="Like">
+    </form>
+</div>
+{% endfor %}
+{% endblock body %}
+
+    

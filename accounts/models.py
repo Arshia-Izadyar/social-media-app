@@ -19,7 +19,7 @@ class User(AbstractUser):
     phone_number = models.CharField(verbose_name=_("Phone number"), max_length=14, unique=True)
     is_admin = models.BooleanField(default=False, verbose_name=_("Is admin"))
     user_type = models.PositiveSmallIntegerField(verbose_name=_("user type"), choices=user_type, default=FREE_USER)
-    is_staff = models.BooleanField(default=False, verbose_name=_("Active"))
+    is_staff = models.BooleanField(default=False, verbose_name=_("Staff"))
     is_active = models.BooleanField(verbose_name=_("Active"),default=True)
     # TODO: add validator and default username generator
     username = models.CharField(max_length=200, unique=True)
