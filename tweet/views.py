@@ -8,8 +8,8 @@ from django.shortcuts import render
 from django.db.models import Q, Count
 from django.db import IntegrityError
 
-from .forms import TweetForm, LikeForm, CommentForm
-from .models import Tweet, Like, Comment
+from .forms import TweetForm, LikeForm, CommentForm, CommentLikeForm
+from .models import Tweet, Like, Comment, CommentLike
 
 class CreateTweet(CreateView):
     form_class = TweetForm
@@ -59,7 +59,9 @@ class TweetDetails(DetailView):
         tweet = ctx["tweet"]
         ctx["comment_form"] = CommentForm()
         ctx["like_count"] = Like.objects.filter(tweet=tweet).count() 
-        ctx["tweet_comments"] = tweet.comments.all()
+        tweet_comments = tweet.comments.prefetch_related("comment_likes").all()
+        
+        ctx["tweet_comments"] =tweet_comments
         return ctx
 
 class AddLike(View):
@@ -87,17 +89,28 @@ class AddComment(View):
             comment.author = request.user
             tweet = Tweet.objects.get(pk=tweed_id)
             comment.tweet = tweet
-            a = request.POST.get("parent_comment", None)
-            print()
-            print()
-            print(a)
-            b= Comment.objects.filter(Q(pk=a)&Q(tweet=tweet)).first()
-            print(b)
+            comment_id = request.POST.get("parent_comment", None)
+            parent_comment = Comment.objects.filter(Q(pk=comment_id)&Q(tweet=tweet)).first()
             
-            comment.parent_comment = b
-          
+            comment.parent_comment = parent_comment          
             comment.save()
             return HttpResponseRedirect(request.POST.get("next", "/home"))
         else:
             raise Http404
- 
+
+class AddCommentLike(View):
+    def post(self, request, *args, **kwargs):
+        form = CommentLikeForm(request.POST)
+        try:
+            if form.is_valid():
+                like = form.save(commit=False)
+                like.author = request.user
+                like.save()
+                return HttpResponseRedirect(request.POST.get("next", "/home"))
+            raise Http404
+        except IntegrityError:
+            l = CommentLike.objects.filter(Q(author=like.author)&Q(comment=like.comment)).first()
+            l.delete()
+            return HttpResponseRedirect(request.POST.get("next", "/home"))
+            
+        

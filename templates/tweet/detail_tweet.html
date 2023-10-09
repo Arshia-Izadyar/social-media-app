@@ -31,8 +31,9 @@ Comment detail
     {% for comment in tweet_comments %}
         <div class="comment">
             {% if not comment.parent_comment %}
-            <h3>{{ comment.author }} - {{ comment.created_at }}</h3>
+            <h3>{{ comment.author }} - {{ comment.created_at }}:</h3>
             <h3>{{ comment.content }}</h3>
+            <p> likes: {{ comment.comment_likes.count }}</p>
                 {% if comment.image %}
                     <img src={{comment.image.url}} style="max-width:200px;max-height:200px">
                 
@@ -42,15 +43,22 @@ Comment detail
                         Your browser does not support the video tag.
                     </video>
                 {% endif %}
+                <br>
+                <form method="post" action="/comment-like/" >
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <input type="hidden" name="comment" value="{{ comment.pk }}">
+                        <input type="submit" value="like comment">
+                        
+                </form>
                 
                 <form method="post" action="/comment/" enctype="multipart/form-data" style="display: inline-block;">
                     {% csrf_token %}
-                    <div style="display: inline-block;">
-                        {{comment_form.as_div}}</div>
-                        <input type="hidden" name="next" value="{{ request.path }}">
-                        <input type="hidden" name="parent_comment" value="{{ comment.id }}">
-                        <input type="hidden" name="tweet" value="{{tweet.pk}}">
-                        <input type="submit" value="Comment">
+                    {{comment_form.as_div}}</div>
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <input type="hidden" name="parent_comment" value="{{ comment.id }}">
+                    <input type="hidden" name="tweet" value="{{tweet.pk}}">
+                    <input type="submit" value="Comment">
                     
                 </form>
 

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Tweet, Like, Comment
+from .models import Tweet, Like, Comment, CommentLike
 
 @admin.register(Tweet)
 class TweetAdmin(admin.ModelAdmin):
@@ -20,3 +20,7 @@ class TweetAdmin(admin.ModelAdmin):
 class TweetAdmin(admin.ModelAdmin):
     search_fields = ("author__username",)
     list_display = ("id", "author", "created_at", "tweet")
+    
+@admin.register(CommentLike)
+class TweetAdmin(admin.ModelAdmin):
+    list_display = ("id","comment")
