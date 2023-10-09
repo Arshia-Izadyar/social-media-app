@@ -62,4 +62,10 @@ class Retweet(models.Model):
     
     class Meta:
         unique_together = ('user', 'original_tweet')
+
+class BookMark(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bookmarks")
+    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE, related_name="bookmarks")
     
+    class Meta:
+        unique_together = ('user', 'tweet')

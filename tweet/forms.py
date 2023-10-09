@@ -1,5 +1,5 @@
 from django import forms
-from .models import Tweet, Like, Comment,CommentLike
+from .models import Tweet, Like, Comment,CommentLike, BookMark
 
 
 class TweetForm(forms.ModelForm):
@@ -21,3 +21,10 @@ class CommentLikeForm(forms.ModelForm):
     class Meta:
         model = CommentLike
         fields = ("comment",)
+        
+        
+class BookmarkForm(forms.ModelForm):
+    class Meta:
+        model = BookMark
+        fields = ("tweet",)
+    

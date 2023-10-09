@@ -10,6 +10,13 @@ Comment detail
 <h3>{{tweet.content}}</h3>
 <p>{{like_count}}</p>
 
+{% if tweet.author == request.user %}
+    <form action="{% url 'delete' tweet.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit">delete</button>
+    </form>
+{% endif %}
+
 <form method="post" action="/like/">
     {% csrf_token %}
     <input type="hidden" name="next" value="{{ request.path }}">
@@ -17,6 +24,16 @@ Comment detail
     <input type="submit" value="like">
 </form>
 
+<form method="post" action="/bookmark/" >
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.path }}">
+    <input type="hidden" name="tweet" value="{{ tweet.pk }}">
+    {% if bookmark %}
+        <input type="submit" value="remove bookmark">
+    {% else %}
+        <input type="submit" value="bookmark">
+    {% endif %}
+</form> 
 
 <form method="post" action="/comment/" enctype="multipart/form-data">
     {% csrf_token %}
@@ -36,7 +53,6 @@ Comment detail
             <p> likes: {{ comment.comment_likes.count }}</p>
                 {% if comment.image %}
                     <img src={{comment.image.url}} style="max-width:200px;max-height:200px">
-                
                 {% elif comment.video %}
                     <video width="200" height="200" controls>
                         <source src={{comment.video.url}} type="video/mp4">
@@ -45,11 +61,10 @@ Comment detail
                 {% endif %}
                 <br>
                 <form method="post" action="/comment-like/" >
-                        {% csrf_token %}
-                        <input type="hidden" name="next" value="{{ request.path }}">
-                        <input type="hidden" name="comment" value="{{ comment.pk }}">
-                        <input type="submit" value="like comment">
-                        
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <input type="hidden" name="comment" value="{{ comment.pk }}">
+                    <input type="submit" value="like comment">
                 </form>
                 
                 <form method="post" action="/comment/" enctype="multipart/form-data" style="display: inline-block;">
@@ -72,7 +87,7 @@ Comment detail
                             <h3>{{ reply.author }} - {{ reply.created_at }} </h3>
                             <p>{{ reply.content }}</p>
                             {% if reply.image %}
-                             <img src={{reply.image.url}} style="max-width:200px;max-height:200px">
+                                <img src={{reply.image.url}} style="max-width:200px;max-height:200px">
                 
                             {% elif reply.video %}
                                 <video width="200" height="200" controls>

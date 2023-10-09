@@ -1,15 +1,16 @@
 from typing import Any
-from django.db import models
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, Http404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, DetailView
+from django.views.generic import CreateView, ListView, DetailView, DeleteView
 from django.views.generic import View
-from django.shortcuts import render
 from django.db.models import Q, Count
 from django.db import IntegrityError
 
-from .forms import TweetForm, LikeForm, CommentForm, CommentLikeForm
-from .models import Tweet, Like, Comment, CommentLike
+from .forms import TweetForm, LikeForm, CommentForm, CommentLikeForm, BookmarkForm
+from .models import Tweet, Like, Comment, CommentLike, BookMark
+
+# TODO: edit Tweet
+# TODO: delete tweet
 
 class CreateTweet(CreateView):
     form_class = TweetForm
@@ -33,7 +34,7 @@ class ListTweet(ListView):
         qs = qs.annotate(like_count=Count("likes"))
         return qs
 
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+    def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["user"] = self.request.user
         return ctx
@@ -48,7 +49,7 @@ class TweetDetails(DetailView):
         qs = Tweet.objects.filter(Q(author__username=username) & Q(pk=pk))
         return qs
     
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):        
         qs = self.get_queryset()
         if len(qs) ==0 :
             return HttpResponseRedirect("/home")
@@ -60,10 +61,28 @@ class TweetDetails(DetailView):
         ctx["comment_form"] = CommentForm()
         ctx["like_count"] = Like.objects.filter(tweet=tweet).count() 
         tweet_comments = tweet.comments.prefetch_related("comment_likes").all()
-        
+        usr_bookmarks = self.request.user.bookmarks.filter(tweet=tweet)
+        ctx["bookmark"] = usr_bookmarks.exists()
+
+                
         ctx["tweet_comments"] =tweet_comments
         return ctx
 
+class DeleteTweet(DeleteView):
+    model = Tweet
+    success_url = "/home"
+    
+    def post(self, request, *args, **kwargs):
+        pk = self.kwargs['pk']
+        qs = Tweet.objects.filter(pk=pk)
+        if qs.exists() and qs.first().author == request.user:
+            return super().post(request, *args, **kwargs)
+        else:
+            raise Http404
+    
+    
+
+    
 class AddLike(View):
     def post(self, request, *args, **kwargs):
         form = LikeForm(request.POST)
@@ -103,6 +122,7 @@ class AddCommentLike(View):
         form = CommentLikeForm(request.POST)
         try:
             if form.is_valid():
+                
                 like = form.save(commit=False)
                 like.author = request.user
                 like.save()
@@ -113,4 +133,21 @@ class AddCommentLike(View):
             l.delete()
             return HttpResponseRedirect(request.POST.get("next", "/home"))
             
+class AddToBookMark(View):
+    def post(self, request, *args, **kwargs):
+        form = BookmarkForm(request.POST)
+        try:
+            if form.is_valid():
+                bookmark = form.save(commit=False)
+                bookmark.user = request.user
+                bookmark.save()
+                return HttpResponseRedirect(request.POST.get("next", "/home"))
+            raise Http404
+        except IntegrityError:
+            b = BookMark.objects.filter(Q(user=request.user)&Q(tweet=bookmark.tweet))
+            b.delete()
+            return HttpResponseRedirect(request.POST.get("next", "/home"))
+            
+    
+
         
