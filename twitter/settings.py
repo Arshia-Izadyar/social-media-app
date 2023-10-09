@@ -53,7 +53,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "twitter.urls"
-
+AUTH_USER_MODEL = "accounts.User"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -82,7 +82,7 @@ DATABASES = {
         "NAME": DB_NAME,
         "USER": DB_USER,
         "PASSWORD": DB_PASS,
-        "HOST": "localhost",
+        "HOST": "postgres",
         "PORT": "5432",
     }
 }
