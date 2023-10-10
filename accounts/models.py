@@ -20,7 +20,7 @@ class User(AbstractUser):
     is_admin = models.BooleanField(default=False, verbose_name=_("Is admin"))
     user_type = models.PositiveSmallIntegerField(verbose_name=_("user type"), choices=user_type, default=FREE_USER)
     is_staff = models.BooleanField(default=False, verbose_name=_("Staff"))
-    is_active = models.BooleanField(verbose_name=_("Active"),default=True)
+    is_active = models.BooleanField(verbose_name=_("Active"),default=False)
     # TODO: add validator and default username generator
     username = models.CharField(max_length=200, unique=True)
     bio = models.TextField(null=True, blank=True)

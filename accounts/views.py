@@ -1,3 +1,91 @@
-from django.shortcuts import render
+from typing import Any
+from django import http
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse_lazy 
 
-# Create your views here.
+
+from django.views.generic import View, DetailView
+from django.http import HttpResponseRedirect, Http404
+from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth import authenticate, login,get_user_model,logout
+from django.core.exceptions import ValidationError
+from .forms import CreateUserForm, LoginForm
+
+# TODO: add user search for profile - Done
+# TODO: add user profile / update - Done
+# TODO: add follower list / following
+# TODO: add user activation
+
+
+User = get_user_model()
+
+class CreateUser(View):
+
+    def get(self, request):
+        form = CreateUserForm()
+        return render(request, "accounts/register.html", {"form": form})
+    def post(self, request, *args, **kwargs):
+        form = CreateUserForm(request.POST)
+        
+        
+        if form.is_valid():
+            
+            cleaned_data = form.cleaned_data
+            password1 = cleaned_data["password"]
+            password2 = cleaned_data["password2"]
+            if password2 != password1:
+                form.add_error("password", "passwords dont match")
+                return render(request, "accounts/register.html", {"form": form})
+            try:
+                validate_password(password1)
+            except ValidationError as e:
+                form.add_error("password", e)
+                return render(request, "accounts/register.html", {"form": form})
+            hashed_password = make_password(password1)
+            user = User.objects.create(username=cleaned_data["username"], password=hashed_password, phone_number=cleaned_data["phone_number"], email=cleaned_data["email"])
+            user.first_name = cleaned_data["first_name"]
+            user.last_name = cleaned_data["last_name"]
+            user.save()
+            return HttpResponseRedirect(reverse_lazy("login-user"))
+        return render(request, "accounts/register.html", {"form": form})
+        
+class UserLogin(View):
+    
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+        return HttpResponseRedirect(reverse_lazy("home"))
+        
+    
+    def get(self, request):
+        form = LoginForm()
+        return render(request, "accounts/login.html", {"form": form})
+        
+    def post(self, request, *args, **kwargs):
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            
+            username, password = form.cleaned_data["username"], form.cleaned_data["password"]
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return HttpResponseRedirect(reverse_lazy("home"))
+            return HttpResponseRedirect(reverse_lazy("sign-user"))
+        raise Http404
+                
+class UserLogout(View):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+        return HttpResponseRedirect(reverse_lazy("login-user"))
+    
+    def get(self, request):
+        usr = self.request.user
+        user = User.objects.get(username=usr.username)
+        logout(request)
+        return HttpResponseRedirect(reverse_lazy("login-user"))
+    
+
+
+    

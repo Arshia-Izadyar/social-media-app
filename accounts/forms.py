@@ -4,6 +4,7 @@ from django import forms
 from django.utils.translation import gettext as _
 
 from .models import User
+from utils.validators import email_validation, phone_validation
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -16,9 +17,6 @@ class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = User
         fields = UserChangeForm.Meta.fields
-
-
-
 
 
 # class MyCustomSignupForm(SignupForm):
@@ -35,3 +33,20 @@ class CustomUserChangeForm(UserChangeForm):
 #         user.save()
 
 #         return user
+
+
+
+
+class CreateUserForm(forms.ModelForm):
+    email = forms.EmailField(validators=[email_validation.validate_email])
+    phone_number = forms.CharField(validators=[phone_validation.validate_phone_number], max_length=14)
+    password2 = forms.CharField()
+
+    class Meta:
+        model = User
+        fields = ("first_name", "last_name", "username", "email", "phone_number", "password","password2")
+
+class LoginForm(forms.Form):
+    username = forms.CharField()
+    password = forms.CharField(widget=forms.PasswordInput)
+    # fields = ("username","password")

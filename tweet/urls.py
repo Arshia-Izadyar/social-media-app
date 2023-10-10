@@ -9,7 +9,9 @@ from .views import (CreateTweet,
                     DeleteTweet,
                     DeleteComment,
                     UpdateTweet,
-                    AddRetweet)
+                    AddRetweet,
+                    ProfileDetail,
+                    UpdateProfile)
 
 urlpatterns = [
     path("tweet/", CreateTweet.as_view(), name="tweet"),
@@ -23,5 +25,8 @@ urlpatterns = [
     path("retweet/<slug:username>/<int:pk>/", AddRetweet.as_view(), name="retweet"),
     path("delete/<int:pk>", DeleteTweet.as_view(), name="delete"),
     path("comment/delete/<int:pk>", DeleteComment.as_view(), name="delete-comment"),
+    path("<slug:username>/", ProfileDetail.as_view(), name="profile"),
+    path("update/<slug:username>/", UpdateProfile.as_view(), name="update-profile"),
+
 
 ]

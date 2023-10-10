@@ -51,7 +51,7 @@ Home
     {% if rt.description %}
         <h4>qoute : {{rt.description}}</h4>
     {% endif %}
-            <a href="{% url 'detail' rt.original_tweet.author rt.original_tweet.id  %}"><h3>{{rt.original_tweet.content}}</h3></a>]
+            <a href="{% url 'detail' rt.original_tweet.author rt.original_tweet.id  %}"><h3>{{rt.original_tweet.content}}</h3></a>
         {% if rt.original_tweet.image %}
             <img src={{rt.original_tweet.image.url}} style="max-width:200px;max-height:200px">
         {% elif rt.original_tweet.video %}

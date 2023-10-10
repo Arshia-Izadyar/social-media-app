@@ -1,0 +1,95 @@
+/* Navbar styles */
+.navbar {
+    background-color: black;
+    padding: 10px;
+  }
+  
+  .nav-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .nav-item {
+    display: inline;
+    margin-right: 10px;
+  }
+  
+  .nav-item a {
+    color: red;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .nav-item a:hover {
+    color: white;
+  }
+  
+  /* Body styles */
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+  }
+  
+  /* Page title styles */
+  h1 {
+    color: red;
+    font-size: 24px;
+    margin-top: 20px;
+  }
+  
+  /* Content section styles */
+  .content {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Pagination styles */
+  .pagination {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .step-links a {
+    color: red;
+    text-decoration: none;
+    margin: 0 5px;
+  }
+  
+  .current-page {
+    color: black;
+    font-weight: bold;
+  }
+  
+
+  .input-field {
+    margin-bottom: 10px;
+  }
+  
+  .input-field input[type="text"],
+  .input-field input[type="email"],
+  .input-field input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    color: #000000;
+  }
+  
+  .input-field input[type="text"]:focus,
+  .input-field input[type="email"]:focus,
+  .input-field input[type="password"]:focus {
+    outline: none;
+    border-color: #ff0000;
+  }
+  
+  .input-field .error-message {
+    color: #ff0000;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+  

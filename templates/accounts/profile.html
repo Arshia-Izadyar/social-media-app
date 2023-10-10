@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}
+Profile
+{% endblock title %}    
+
+{% block body %}
+    <h1> profile for {{user.username}}</h1>
+    <h3>date joined : {{user.date_joined.date}}</h3>
+{% if user.birth_day %}
+    <h3>Born : {{user.birth_day}}</h3>
+{% endif %}
+{% if user.location %}
+    <h3>location : {{user.location}}</h3>
+{% endif %}
+    <h3>bio : {{user.bio}}</h3>
+
+{% if request.user == user %}
+    <h2> edit your profile </h2>
+    <form method="post" action="{% url 'update-profile' user.username %}">
+        {% csrf_token %}
+
+        <p> Bio <input type="text" name="bio"> </p>
+        <p>dato of Birth <input type="date" name="birth_day"> </p>
+        <p> location <input type="text" name="location"> </p>
+        <input type="submit" value="edit">
+    </form>
+{% endif %}
+
+
+{% for tweet in tweets %}
+    <div class="tweet">
+        <ul>
+            <li>
+                <h3>{{tweet.author}} - {{tweet.created_at}}</h3>
+                <a href="{% url 'detail' tweet.author tweet.id  %}"> <h3>{{tweet.content}}</h3> </a>
+                <p>Comments: {{tweet.comments.count}}</p>
+                <p>Likes: {{tweet.like_count}}</p>
+                <form method="post" action="{% url 'retweet' request.user.username tweet.pk %}">
+                    {% csrf_token %}
+                    <input type="text" name="description">
+                    <input type="hidden" name="original_tweet" value="{{tweet.pk}}">
+                    <input type="hidden" name="next" value="{{ request.path }}">
+
+                    <input type="submit" value="retweet">
+                </form>
+            </li>
+        </ul>
+    
+            {% if tweet.image %}
+                <img src={{tweet.image.url}} style="max-width:200px;max-height:200px">
+            {% elif tweet.video %}
+                <video width="640" height="360" controls>
+                    <source src={{tweet.video.url}} type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% endif %}
+    
+            <p></p>
+    
+            <form method="post" action="/like/" id="like-form">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <input type="hidden" name="tweet" value="{{tweet.pk}}">
+                <input type="submit" value="Like">
+            </form>
+        </div>
+    {% endfor %}
+
+
+    {% for rt in retweets %}
+    <ul>
+        <li>
+
+
+    <h3> {{rt.user}} Retweeted from {{rt.original_tweet.author}} at {{rt.created_at}} </h3>
+    {% if rt.description %}
+        <h4>qoute : {{rt.description}}</h4>
+    {% endif %}
+            <a href="{% url 'detail' rt.original_tweet.author rt.original_tweet.id  %}"><h3>{{rt.original_tweet.content}}</h3></a>
+        {% if rt.original_tweet.image %}
+            <img src={{rt.original_tweet.image.url}} style="max-width:200px;max-height:200px">
+        {% elif rt.original_tweet.video %}
+            <video width="640" height="360" controls>
+                <source src={{rt.original_tweet.video.url}} type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endif %}
+        </li>
+    </ul>
+    {% endfor %}
+
+    
+    <h1> Likes and comments </h1>
+    {% for commet in comments %}
+    <ul>
+        <li>
+            <h3>{{commet.tweet.author}} - {{commet.tweet.created_at}}</h3>
+            <a href="{% url 'detail' commet.tweet.author commet.tweet.id  %}"> <h3>{{commet.tweet.content}}</h3> </a>
+            <p>Comments: {{commet.tweet.comments.count}}</p>
+            <p>Likes: {{commet.like_count}}</p>
+            <form method="post" action="{% url 'retweet' request.user.username commet.tweet.pk %}">
+                {% csrf_token %}
+                <input type="text" name="description">
+                <input type="hidden" name="original_tweet" value="{{commet.tweet.pk}}">
+                <input type="hidden" name="next" value="{{ request.path }}">
+
+                <input type="submit" value="retweet">
+            </form>
+            {% if commet.tweet.image %}
+            <img src={{commet.tweet.image.url}} style="max-width:200px;max-height:200px">
+        {% elif tweet.video %}
+            <video width="640" height="360" controls>
+                <source src={{commet.tweet.video.url}} type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endif %}
+
+        <p></p>
+
+        <form method="post" action="/like/" id="like-form">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <input type="hidden" name="tweet" value="{{commet.tweet.pk}}">
+            <input type="submit" value="Like">
+        </form>
+    </div>
+        </li>
+    </ul>
+    
+    {% endfor %}
+
+{% endblock body %}
