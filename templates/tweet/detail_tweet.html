@@ -35,6 +35,8 @@ Comment detail
     {% endif %}
 </form> 
 
+
+<h3> Add a Comment </h3>
 <form method="post" action="/comment/" enctype="multipart/form-data">
     {% csrf_token %}
     {{comment_form.as_p}}
@@ -44,8 +46,10 @@ Comment detail
 </form>
 
 
+<h2> Comments</h2>
 
     {% for comment in tweet_comments %}
+
         <div class="comment">
             {% if not comment.parent_comment %}
             <h3>{{ comment.author }} - {{ comment.created_at }}:</h3>
@@ -59,7 +63,15 @@ Comment detail
                         Your browser does not support the video tag.
                     </video>
                 {% endif %}
-                <br>
+                {% if comment.author == request.user %}
+                    <form action="{% url 'delete-comment' comment.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">delete</button>
+                        <input type="hidden" name="next" value="{{ request.path }}">
+        
+                    </form>
+                {% endif %}
+                <br></br>
                 <form method="post" action="/comment-like/" >
                     {% csrf_token %}
                     <input type="hidden" name="next" value="{{ request.path }}">
@@ -69,7 +81,7 @@ Comment detail
                 
                 <form method="post" action="/comment/" enctype="multipart/form-data" style="display: inline-block;">
                     {% csrf_token %}
-                    {{comment_form.as_div}}</div>
+                    {{comment_form.as_p}}</div>
                     <input type="hidden" name="next" value="{{ request.path }}">
                     <input type="hidden" name="parent_comment" value="{{ comment.id }}">
                     <input type="hidden" name="tweet" value="{{tweet.pk}}">
@@ -82,6 +94,7 @@ Comment detail
             {% if comment.replies.all %}
                 <div class="nested-replies">
                     {% for reply in comment.replies.all %}
+             
                         <div class="reply">
                             <h3>reply to {{comment.author}}</h3>
                             <h3>{{ reply.author }} - {{ reply.created_at }} </h3>
@@ -94,6 +107,13 @@ Comment detail
                                     <source src={{reply.video.url}} type="video/mp4">
                                     Your browser does not support the video tag.
                                 </video>
+                            {% endif %}
+                            {% if comment.author == request.user %}
+                                <form action="{% url 'delete-comment' reply.id %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <button type="submit">delete</button>
+                                </form>
                             {% endif %}
                         </div>
                     {% endfor %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}
+update a tweet
+{% endblock title %}    
+
+{% block body %}
+<h1>update</h1>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" value="TWEET">
+</form>
+{% endblock body %}

@@ -14,6 +14,12 @@ Home
             <a href="{% url 'detail' tweet.author tweet.id  %}"> <h3>{{tweet.content}}</h3> </a>
             <p>Comments: {{tweet.comments.count}}</p>
             <p>Likes: {{tweet.like_count}}</p>
+            <form method="post" action="{% url 'retweet' request.user.username tweet.pk %}">
+                {% csrf_token %}
+                <input type="text" name="description">
+                <input type="hidden" name="original_tweet" value="{{tweet.pk}}">
+                <input type="submit" value="retweet">
+            </form>
         </li>
     </ul>
 
@@ -35,6 +41,27 @@ Home
             <input type="submit" value="Like">
         </form>
     </div>
+{% endfor %}
+{% for rt in retweets %}
+<ul>
+        <li>
+
+
+    <h3> {{rt.user}} Retweeted from {{rt.original_tweet.author}} at {{rt.created_at}} </h3>
+    {% if rt.description %}
+        <h4>qoute : {{rt.description}}</h4>
+    {% endif %}
+            <a href="{% url 'detail' rt.original_tweet.author rt.original_tweet.id  %}"><h3>{{rt.original_tweet.content}}</h3></a>]
+        {% if rt.original_tweet.image %}
+            <img src={{rt.original_tweet.image.url}} style="max-width:200px;max-height:200px">
+        {% elif rt.original_tweet.video %}
+            <video width="640" height="360" controls>
+                <source src={{rt.original_tweet.video.url}} type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endif %}
+    </li>
+    </ul>
 {% endfor %}
 {% endblock body %}
 
