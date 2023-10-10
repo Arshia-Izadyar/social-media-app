@@ -7,6 +7,9 @@ Profile
 {% block body %}
     <h1> profile for {{user.username}}</h1>
     <h3>date joined : {{user.date_joined.date}}</h3>
+    <h3> Following: {{user.following.count}} </h3>
+    <h3> Followers: {{user.followers.count}} </h3>
+
 {% if user.birth_day %}
     <h3>Born : {{user.birth_day}}</h3>
 {% endif %}
@@ -24,6 +27,21 @@ Profile
         <p>dato of Birth <input type="date" name="birth_day"> </p>
         <p> location <input type="text" name="location"> </p>
         <input type="submit" value="edit">
+    </form>
+    {% else %}
+    <form method="post" action="{% url 'follow-user' %}">
+        {% csrf_token %}
+        {% if request.user in user.followers.all %}
+        <h1>unfollow</h1>
+        <input type="hidden" name="following" value="true">
+        <input type="hidden" name="user" value="{{user.pk}}">
+        <input type="submit" value="unfollow">
+        {% else %}
+        <h1>follow</h1>
+        <input type="hidden" name="user" value="{{user.pk}}">
+        <input type="submit" value="follow">
+        {% endif %}
+
     </form>
 {% endif %}
 

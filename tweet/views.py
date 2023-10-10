@@ -255,6 +255,9 @@ class ProfileDetail(DetailView):
     def get_context_data(self, **kwargs):
         user = self.get_object()
         ctx = super().get_context_data(**kwargs)
+        # s = user.followers.count()
+        # d = user.following.all()
+        # print(s, d)
         ctx["tweets"] = Tweet.objects.filter(author=user).prefetch_related("likes").annotate(like_count=Count("likes")).order_by("created_at")
         ctx["retweets"] = Retweet.objects.filter(user=user).order_by("created_at")
         ctx["comments"] = Comment.objects.filter(author=user).prefetch_related("tweet").annotate(like_count=Count("tweet__likes"))

@@ -2,8 +2,7 @@ from typing import Any
 from django import http
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy 
-
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import View, DetailView
 from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.password_validation import validate_password
@@ -87,5 +86,20 @@ class UserLogout(View):
         return HttpResponseRedirect(reverse_lazy("login-user"))
     
 
-
+class Follow(LoginRequiredMixin, View):
+    
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
+    
+    def post(self, request, *args, **kwargs):
+        curr_user = get_object_or_404(User, username=request.user.username)
+        target_user = request.POST.get("user")
+        following = request.POST.get("following")
+        if following is not None:
+            curr_user.following.remove(target_user)
+        else:
+            curr_user.following.add(target_user)
+            
+        return HttpResponseRedirect("/dummy/")
     
