@@ -36,15 +36,11 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "image",
-                    models.ImageField(
-                        null=True, upload_to="./uploads", verbose_name="Image"
-                    ),
+                    models.ImageField(null=True, upload_to="./uploads", verbose_name="Image"),
                 ),
                 (
                     "video",
-                    models.FileField(
-                        null=True, upload_to="./files", verbose_name="video"
-                    ),
+                    models.FileField(null=True, upload_to="./files", verbose_name="video"),
                 ),
                 (
                     "author",

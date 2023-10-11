@@ -1,18 +1,18 @@
 from django.urls import path
-from accounts.views import ShowUsersFollower, ShowUsersFollowing
-from .views import (CreateTweet,
-                    ListTweet,
-                    TweetDetails,
-                    AddLike,
-                    AddComment,
-                    AddCommentLike,
-                    AddToBookMark,
-                    DeleteTweet,
-                    DeleteComment,
-                    UpdateTweet,
-                    AddRetweet,
-                    ProfileDetail,
-                    UpdateProfile)
+from accounts.views import ShowUsersFollower, ShowUsersFollowing, UpdateProfile, ListBookMarks, ProfileDetail
+from .views import (
+    CreateTweet,
+    ListTweet,
+    TweetDetails,
+    AddLike,
+    AddComment,
+    AddCommentLike,
+    AddToBookMark,
+    DeleteTweet,
+    DeleteComment,
+    UpdateTweet,
+    AddRetweet,
+)
 
 urlpatterns = [
     path("tweet/", CreateTweet.as_view(), name="tweet"),
@@ -30,4 +30,5 @@ urlpatterns = [
     path("update/<slug:username>/", UpdateProfile.as_view(), name="update-profile"),
     path("<slug:username>/followers", ShowUsersFollower.as_view(), name="followers"),
     path("<slug:username>/following", ShowUsersFollowing.as_view(), name="followings"),
+    path("<slug:username>/bookmarks/", ListBookMarks.as_view(), name="bookmarks"),
 ]

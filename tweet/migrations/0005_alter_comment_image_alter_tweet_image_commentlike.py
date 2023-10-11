@@ -15,16 +15,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="comment",
             name="image",
-            field=models.ImageField(
-                blank=True, null=True, upload_to="./media/uploads", verbose_name="Image"
-            ),
+            field=models.ImageField(blank=True, null=True, upload_to="./media/uploads", verbose_name="Image"),
         ),
         migrations.AlterField(
             model_name="tweet",
             name="image",
-            field=models.ImageField(
-                blank=True, null=True, upload_to="./media/uploads", verbose_name="Image"
-            ),
+            field=models.ImageField(blank=True, null=True, upload_to="./media/uploads", verbose_name="Image"),
         ),
         migrations.CreateModel(
             name="CommentLike",

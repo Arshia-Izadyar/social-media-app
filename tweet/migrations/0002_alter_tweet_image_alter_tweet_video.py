@@ -12,15 +12,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="tweet",
             name="image",
-            field=models.ImageField(
-                blank=True, null=True, upload_to="./uploads", verbose_name="Image"
-            ),
+            field=models.ImageField(blank=True, null=True, upload_to="./uploads", verbose_name="Image"),
         ),
         migrations.AlterField(
             model_name="tweet",
             name="video",
-            field=models.FileField(
-                blank=True, null=True, upload_to="./files", verbose_name="video"
-            ),
+            field=models.FileField(blank=True, null=True, upload_to="./files", verbose_name="video"),
         ),
     ]

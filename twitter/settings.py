@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-from .local_conf import Project_KEY, Debug, DB_NAME,DB_PASS, DB_USER
+from .local_conf import Project_KEY, Debug, DB_NAME, DB_PASS, DB_USER
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,21 +42,19 @@ INSTALLED_APPS = [
     # local
     "accounts.apps.AccountsConfig",
     "tweet.apps.TweetConfig",
-    
-    #3rd party
-    "corsheaders",
+    # 3rd party
+    # "corsheaders",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
+    # "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    
 ]
 
 ROOT_URLCONF = "twitter.urls"
@@ -131,7 +129,6 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATICFILES_DIRS = ((os.path.join(BASE_DIR, "static")),)
-
 
 
 MEDIA_URL = "/media/"

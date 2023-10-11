@@ -1,5 +1,6 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django import forms
+
 # from allauth.account.forms import SignupForm
 from django.utils.translation import gettext as _
 
@@ -35,6 +36,10 @@ class CustomUserChangeForm(UserChangeForm):
 #         return user
 
 
+class UpdateProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ("bio", "location", "birth_day")
 
 
 class CreateUserForm(forms.ModelForm):
@@ -44,7 +49,8 @@ class CreateUserForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "username", "email", "phone_number", "password","password2")
+        fields = ("first_name", "last_name", "username", "email", "phone_number", "password", "password2")
+
 
 class LoginForm(forms.Form):
     username = forms.CharField()

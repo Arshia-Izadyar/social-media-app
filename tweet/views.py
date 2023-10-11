@@ -1,15 +1,14 @@
 from django.http import HttpResponseRedirect, Http404
-from django.urls import reverse_lazy,reverse
-from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView,View
+from django.urls import reverse_lazy, reverse
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView, View
 from django.db.models import Q, Count
 from django.db import IntegrityError
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .forms import TweetForm, LikeForm, CommentForm, CommentLikeForm, BookmarkForm, RetweetForm, UpdateProfileForm
+from .forms import TweetForm, LikeForm, CommentForm, CommentLikeForm, BookmarkForm, RetweetForm
 from .models import Tweet, Like, Comment, CommentLike, BookMark, Retweet
 
 
@@ -18,11 +17,10 @@ class CreateTweet(CreateView):
     success_url = reverse_lazy("home")
 
     template_name = "tweet/create_tweet.html"
-    
+
     @method_decorator(login_required(redirect_field_name=reverse_lazy("login-user")))
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
-    
 
     def form_valid(self, form):
         tweet = form.save(commit=False)
@@ -39,9 +37,7 @@ class ListTweet(LoginRequiredMixin, ListView):
         user = self.request.user
         user_following_list = user.following.all()
 
-        qs = Tweet.objects.filter(
-            Q(author__in=user_following_list)
-        ).prefetch_related("likes").order_by("created_at")
+        qs = Tweet.objects.filter(Q(author__in=user_following_list)).prefetch_related("likes").order_by("created_at")
 
         qs = qs.annotate(like_count=Count("likes"))
         return qs
@@ -91,7 +87,7 @@ class DeleteTweet(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy("home")
 
     def post(self, request, *args, **kwargs):
-        pk = self.kwargs['pk']
+        pk = self.kwargs["pk"]
         qs = Tweet.objects.filter(pk=pk)
         if qs.exists() and qs.first().author == request.user:
             return super().post(request, *args, **kwargs)
@@ -103,7 +99,7 @@ class DeleteComment(LoginRequiredMixin, DeleteView):
     model = Comment
 
     def post(self, request, *args, **kwargs):
-        pk = self.kwargs['pk']
+        pk = self.kwargs["pk"]
         qs = Comment.objects.filter(pk=pk)
         self.success_url = request.POST.get("next", reverse_lazy("home"))
         if qs.exists() and qs.first().author == request.user:
@@ -113,11 +109,10 @@ class DeleteComment(LoginRequiredMixin, DeleteView):
 
 
 class AddLike(View):
-    
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
-    
+
     def post(self, request, *args, **kwargs):
         form = LikeForm(request.POST)
         try:
@@ -223,7 +218,6 @@ class UpdateTweet(LoginRequiredMixin, View):
         if obj.author != request.user:
             raise Http404
         if form.is_valid():
-        
             form.save()
             return HttpResponseRedirect(reverse_lazy("home"))
         raise Http404
@@ -245,56 +239,3 @@ class AddRetweet(LoginRequiredMixin, View):
                 r.delete()
                 return HttpResponseRedirect(request.POST.get("next", reverse_lazy("home")))
             raise Http404
-
-User = get_user_model()
-class ProfileDetail(DetailView):
-    model = User
-    template_name='accounts/profile.html'
-    context_object_name = "user"
-    
-    
-    @method_decorator(login_required(redirect_field_name=reverse_lazy("login-user")))
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-    
-    def get_queryset(self):
-        username = self.kwargs["username"]
-        return User.objects.filter(username=username)
-    
-    def get_context_data(self, **kwargs):
-        user = self.get_object()
-        ctx = super().get_context_data(**kwargs)
-        ctx["tweets"] = Tweet.objects.filter(author=user).prefetch_related("likes").annotate(like_count=Count("likes")).order_by("created_at")
-        ctx["retweets"] = Retweet.objects.filter(user=user).order_by("created_at")
-        ctx["comments"] = Comment.objects.filter(author=user).prefetch_related("tweet").annotate(like_count=Count("tweet__likes"))
-        return ctx
-    
-    def get_object(self, queryset=None):
-        username = self.kwargs["username"]
-        return get_object_or_404(User, username=username)
-    
-
-class UpdateProfile(LoginRequiredMixin, UpdateView):
-    model = User
-    form_class = UpdateProfileForm
-    
-    
-    def post(self, request, *args, **kwargs):
-        user = self.get_object()
-        form = UpdateProfileForm(request.POST, instance=user)
-        if form.is_valid():
-            update = form.save(commit=False)       
-            update.save()
-            
-            return HttpResponseRedirect(request.POST.get("next"))
-        return Http404
-    
-    def get_object(self, queryset=None):
-        username = self.kwargs["username"]
-        return get_object_or_404(User, username=username)
-    
-    def get_initial(self):
-        user = self.get_object()
-        initial = super(UpdateProfile, self).get_initial()
-        initial['bio'] = user.bio  
-        return initial

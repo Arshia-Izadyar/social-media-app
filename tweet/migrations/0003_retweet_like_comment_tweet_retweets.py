@@ -27,9 +27,7 @@ class Migration(migrations.Migration):
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 (
                     "original_tweet",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="tweet.tweet"
-                    ),
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="tweet.tweet"),
                 ),
                 (
                     "user",
@@ -99,9 +97,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "video",
-                    models.FileField(
-                        blank=True, null=True, upload_to="./files", verbose_name="Video"
-                    ),
+                    models.FileField(blank=True, null=True, upload_to="./files", verbose_name="Video"),
                 ),
                 (
                     "created_at",
@@ -141,8 +137,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="tweet",
             name="retweets",
-            field=models.ManyToManyField(
-                through="tweet.Retweet", to=settings.AUTH_USER_MODEL
-            ),
+            field=models.ManyToManyField(through="tweet.Retweet", to=settings.AUTH_USER_MODEL),
         ),
     ]

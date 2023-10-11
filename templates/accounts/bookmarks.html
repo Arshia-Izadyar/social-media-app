@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}
+bookmark list
+{% endblock title %}    
+
+{% block body %}
+<h1>bookmark list for {{user}} </h1>
+<h1>lol</h1>
+
+
+{% for b in bookmarks %}
+<ul>
+    <li>
+        <h3>{{b.tweet.author}} - {{b.tweet.created_at}}</h3>
+        <a href="{% url 'detail' b.tweet.author b.tweet.id  %}"> <h3>{{b.tweet.content}}</h3> </a>
+        <p>Comments: {{b.tweet.comments.count}}</p>
+        <p>Likes: {{ b.tweet.likes.count }}</p>
+        <form method="post" action="{% url 'retweet' request.user.username b.tweet.pk %}">
+            {% csrf_token %}
+            <input type="text" name="description">
+            <input type="hidden" name="original_tweet" value="{{b.tweet.pk}}">
+            <input type="submit" value="retweet">
+        </form>
+    </li>
+</ul>
+
+    {% if b.tweet.image %}
+        <img src={{b.tweet.image.url}} style="max-width:200px;max-height:200px">
+    {% elif b.tweet.video %}
+        <video width="640" height="360" controls>
+            <source src={{b.tweet.video.url}} type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    {% endif %}
+
+    <p></p>
+{% endfor %}
+{% endblock body %}

@@ -8,7 +8,7 @@ from .models import Tweet, Like, Comment, CommentLike, Retweet
 class TweetAdmin(admin.ModelAdmin):
     search_fields = ("author__username",)
     list_display = ("id", "author", "created_at")
-    order_by = ("-created_time")
+    order_by = "-created_time"
 
 
 @admin.register(Like)

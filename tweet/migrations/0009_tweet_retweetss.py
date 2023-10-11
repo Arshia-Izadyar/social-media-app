@@ -14,8 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="tweet",
             name="retweetss",
-            field=models.ManyToManyField(
-                through="tweet.Retweet", to=settings.AUTH_USER_MODEL
-            ),
+            field=models.ManyToManyField(through="tweet.Retweet", to=settings.AUTH_USER_MODEL),
         ),
     ]

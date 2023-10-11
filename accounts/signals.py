@@ -8,20 +8,19 @@ from django.conf import settings
 
 User = get_user_model()
 
+
 @receiver(post_save, sender=User)
 def user_create(sender, instance, created, **kwargs):
     if created:
-        subject = 'welcome'
-        message = 'welcome to twitter'
+        subject = "welcome"
+        message = "welcome to twitter"
         from_email = "test@test.com"
         recipient_list = [instance.email]
 
         email = EmailMessage(subject, message, from_email, recipient_list)
-        email.content_subtype = 'html' 
+        email.content_subtype = "html"
         with open("templates/accounts/welcome.html", "r") as f:
             html_body = f.read()
         email.body = html_body
 
         email.send()
-        
-        
