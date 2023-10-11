@@ -9,6 +9,8 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate, login,get_user_model,logout
 from django.core.exceptions import ValidationError
+from django.db.models import Q
+
 from .forms import CreateUserForm, LoginForm
 
 # TODO: add user activation
@@ -43,7 +45,9 @@ class CreateUser(View):
             user.first_name = cleaned_data["first_name"]
             user.last_name = cleaned_data["last_name"]
             user.save()
-            return HttpResponseRedirect(reverse_lazy("login-user"))
+            usr = authenticate(username=user.username, password=password1)
+            login(request, usr)
+            return HttpResponseRedirect(reverse_lazy("home"))
         return render(request, "accounts/register.html", {"form": form})
         
 class UserLogin(View):
@@ -136,5 +140,15 @@ class ShowUsersFollowing(ListView):
         ctx['user'] = user
         return ctx
         
-     
+    
+class ActivateAccount(View):
+    def get(self, request, *args, **kwargs):
+        username = self.kwargs["username"]
+        uuid = self.kwargs["uuid"]
+        user = User.objects.filter(Q(uuid=uuid) & Q(username=username)).first()
+        if user is not None:
+            user.is_verified = True
+            user.save()
+            return HttpResponseRedirect(reverse_lazy("home"))
+        raise Http404
     
