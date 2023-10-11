@@ -12,7 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-from .local_conf import Project_KEY, Debug, DB_NAME, DB_PASS, DB_USER
+from decouple import config
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,10 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = Project_KEY
+SECRET_KEY = config("Project_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = Debug
+DEBUG = config("Debug")
 
 ALLOWED_HOSTS = ["*"]
 
@@ -43,13 +44,13 @@ INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
     "tweet.apps.TweetConfig",
     # 3rd party
-    # "corsheaders",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    # "corsheaders.middleware.CorsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -84,9 +85,9 @@ WSGI_APPLICATION = "twitter.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": DB_NAME,
-        "USER": DB_USER,
-        "PASSWORD": DB_PASS,
+        "NAME": config("DB_NAME"),
+        "USER": config("DB_USER"),
+        "PASSWORD": config("DB_PASS"),
         "HOST": "postgres",
         "PORT": "5432",
     }
