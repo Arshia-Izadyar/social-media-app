@@ -3,6 +3,8 @@ this is a social media app like tweeter that users can post text/video/images
 
 features like reTweet, bookmark, like, comment, like comments, reply comments are implemented
 
+done in (1.5) Day
+
 ### How to use 
 - first create a .env file
 - after creating the .env file add required info
