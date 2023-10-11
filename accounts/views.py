@@ -149,6 +149,7 @@ class ActivateAccount(View):
         if user is not None:
             user.is_verified = True
             user.save()
+            login(request, user)
             return HttpResponseRedirect(reverse_lazy("home"))
         raise Http404
     
