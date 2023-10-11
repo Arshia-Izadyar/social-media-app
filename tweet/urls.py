@@ -30,6 +30,4 @@ urlpatterns = [
     path("update/<slug:username>/", UpdateProfile.as_view(), name="update-profile"),
     path("<slug:username>/followers", ShowUsersFollower.as_view(), name="followers"),
     path("<slug:username>/following", ShowUsersFollowing.as_view(), name="followings"),
-
-
 ]

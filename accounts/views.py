@@ -1,9 +1,9 @@
-from typing import Any
-from django import http
+from django.contrib.auth.decorators import login_required 
+from django.utils.decorators import method_decorator 
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse_lazy 
+from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import View, DetailView, ListView
+from django.views.generic import View, ListView
 from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.hashers import make_password
@@ -11,9 +11,6 @@ from django.contrib.auth import authenticate, login,get_user_model,logout
 from django.core.exceptions import ValidationError
 from .forms import CreateUserForm, LoginForm
 
-# TODO: add user search for profile - Done
-# TODO: add user profile / update - Done
-# TODO: add follower list / following
 # TODO: add user activation
 
 
@@ -88,10 +85,6 @@ class UserLogout(View):
 
 class Follow(LoginRequiredMixin, View):
     
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-    
-    
     def post(self, request, *args, **kwargs):
         curr_user = get_object_or_404(User, username=request.user.username)
         target_user = request.POST.get("user")
@@ -109,6 +102,10 @@ class ShowUsersFollower(ListView):
     template_name = "accounts/follower_list.html"
     context_object_name = "followers"
     
+    @method_decorator(login_required(redirect_field_name=reverse_lazy("login-user")))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
     def get_queryset(self):
         username = self.kwargs["username"]
         return User.objects.get(username=username).followers.all() 
@@ -124,6 +121,10 @@ class ShowUsersFollower(ListView):
 class ShowUsersFollowing(ListView):
     template_name = "accounts/following_list.html"
     context_object_name = "followings"
+    
+    @method_decorator(login_required(redirect_field_name=reverse_lazy("login-user")))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
     
     def get_queryset(self):
         username = self.kwargs["username"]

@@ -1,9 +1,8 @@
-from typing import Any
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, Http404
-from django.urls import reverse_lazy
+from django.http import HttpResponseRedirect, Http404
+from django.urls import reverse_lazy,reverse
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView,View
 from django.db.models import Q, Count
-from django.db import IntegrityError, models
+from django.db import IntegrityError
 from django.shortcuts import render, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -19,6 +18,11 @@ class CreateTweet(CreateView):
     success_url = reverse_lazy("home")
 
     template_name = "tweet/create_tweet.html"
+    
+    @method_decorator(login_required(redirect_field_name=reverse_lazy("login-user")))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
 
     def form_valid(self, form):
         tweet = form.save(commit=False)
@@ -27,7 +31,7 @@ class CreateTweet(CreateView):
         return HttpResponseRedirect(self.success_url)
 
 
-class ListTweet(ListView):
+class ListTweet(LoginRequiredMixin, ListView):
     context_object_name = "tweets"
     template_name = "tweet/list_tweet.html"
 
@@ -53,7 +57,7 @@ class ListTweet(ListView):
         return ctx
 
 
-class TweetDetails(DetailView):
+class TweetDetails(LoginRequiredMixin, DetailView):
     context_object_name = "tweet"
     template_name = "tweet/detail_tweet.html"
 
@@ -82,7 +86,7 @@ class TweetDetails(DetailView):
         return ctx
 
 
-class DeleteTweet(DeleteView):
+class DeleteTweet(LoginRequiredMixin, DeleteView):
     model = Tweet
     success_url = reverse_lazy("home")
 
@@ -95,7 +99,7 @@ class DeleteTweet(DeleteView):
             raise Http404
 
 
-class DeleteComment(DeleteView):
+class DeleteComment(LoginRequiredMixin, DeleteView):
     model = Comment
 
     def post(self, request, *args, **kwargs):
@@ -109,6 +113,11 @@ class DeleteComment(DeleteView):
 
 
 class AddLike(View):
+    
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
     def post(self, request, *args, **kwargs):
         form = LikeForm(request.POST)
         try:
@@ -123,7 +132,7 @@ class AddLike(View):
             return HttpResponseRedirect(request.POST.get("next", reverse_lazy("home")))
 
 
-class AddComment(View):
+class AddComment(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         form = CommentForm(request.POST, request.FILES)
         tweed_id = request.POST.get("tweet")
@@ -143,7 +152,7 @@ class AddComment(View):
             raise Http404
 
 
-class AddCommentLike(View):
+class AddCommentLike(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         form = CommentLikeForm(request.POST)
         try:
@@ -159,7 +168,7 @@ class AddCommentLike(View):
             return HttpResponseRedirect(request.POST.get("next", reverse_lazy("home")))
 
 
-class AddToBookMark(View):
+class AddToBookMark(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         form = BookmarkForm(request.POST)
         try:
@@ -196,7 +205,7 @@ class UpdateTweet2(UpdateView):
 """
 
 
-class UpdateTweet(View):
+class UpdateTweet(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         pk = self.kwargs["pk"]
         obj = Tweet.objects.filter(pk=pk).first()
@@ -220,7 +229,7 @@ class UpdateTweet(View):
         raise Http404
 
 
-class AddRetweet(View):
+class AddRetweet(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         form = RetweetForm(request.POST)
         try:
