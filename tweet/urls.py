@@ -1,4 +1,5 @@
 from django.urls import path
+from accounts.views import ShowUsersFollower, ShowUsersFollowing
 from .views import (CreateTweet,
                     ListTweet,
                     TweetDetails,
@@ -27,6 +28,8 @@ urlpatterns = [
     path("comment/delete/<int:pk>", DeleteComment.as_view(), name="delete-comment"),
     path("<slug:username>/", ProfileDetail.as_view(), name="profile"),
     path("update/<slug:username>/", UpdateProfile.as_view(), name="update-profile"),
+    path("<slug:username>/followers", ShowUsersFollower.as_view(), name="followers"),
+    path("<slug:username>/following", ShowUsersFollowing.as_view(), name="followings"),
 
 
 ]

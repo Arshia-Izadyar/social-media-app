@@ -255,9 +255,6 @@ class ProfileDetail(DetailView):
     def get_context_data(self, **kwargs):
         user = self.get_object()
         ctx = super().get_context_data(**kwargs)
-        # s = user.followers.count()
-        # d = user.following.all()
-        # print(s, d)
         ctx["tweets"] = Tweet.objects.filter(author=user).prefetch_related("likes").annotate(like_count=Count("likes")).order_by("created_at")
         ctx["retweets"] = Retweet.objects.filter(user=user).order_by("created_at")
         ctx["comments"] = Comment.objects.filter(author=user).prefetch_related("tweet").annotate(like_count=Count("tweet__likes"))
@@ -271,17 +268,24 @@ class ProfileDetail(DetailView):
 class UpdateProfile(LoginRequiredMixin, UpdateView):
     model = User
     form_class = UpdateProfileForm
-    success_url ="/"
+    
     
     def post(self, request, *args, **kwargs):
         user = self.get_object()
         form = UpdateProfileForm(request.POST, instance=user)
         if form.is_valid():
-            form.save()
-            return super().post(request, *args, **kwargs)
+            update = form.save(commit=False)       
+            update.save()
+            
+            return HttpResponseRedirect(request.POST.get("next"))
         return Http404
     
     def get_object(self, queryset=None):
         username = self.kwargs["username"]
         return get_object_or_404(User, username=username)
     
+    def get_initial(self):
+        user = self.get_object()
+        initial = super(UpdateProfile, self).get_initial()
+        initial['bio'] = user.bio  
+        return initial

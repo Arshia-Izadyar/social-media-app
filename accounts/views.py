@@ -3,7 +3,7 @@ from django import http
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import View, DetailView
+from django.views.generic import View, DetailView, ListView
 from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.hashers import make_password
@@ -101,5 +101,39 @@ class Follow(LoginRequiredMixin, View):
         else:
             curr_user.following.add(target_user)
             
-        return HttpResponseRedirect("/dummy/")
+        return HttpResponseRedirect(request.POST.get("next", "/home"))
+    
+    
+    
+class ShowUsersFollower(ListView):
+    template_name = "accounts/follower_list.html"
+    context_object_name = "followers"
+    
+    def get_queryset(self):
+        username = self.kwargs["username"]
+        return User.objects.get(username=username).followers.all() 
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)  
+        user = self.kwargs["username"]
+        ctx['user'] = user
+        return ctx
+        
+     
+    
+class ShowUsersFollowing(ListView):
+    template_name = "accounts/following_list.html"
+    context_object_name = "followings"
+    
+    def get_queryset(self):
+        username = self.kwargs["username"]
+        return User.objects.get(username=username).following.all() 
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)  
+        user = self.kwargs["username"]
+        ctx['user'] = user
+        return ctx
+        
+     
     

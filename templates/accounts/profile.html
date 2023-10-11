@@ -7,8 +7,8 @@ Profile
 {% block body %}
     <h1> profile for {{user.username}}</h1>
     <h3>date joined : {{user.date_joined.date}}</h3>
-    <h3> Following: {{user.following.count}} </h3>
-    <h3> Followers: {{user.followers.count}} </h3>
+    <h3> <a href="{% url 'followings' user.username %}">Following:</a> {{user.following.count}} </h3>
+    <h3> <a href="{% url 'followers' user.username %}">Followers:</a> {{user.followers.count}} </h3>
 
 {% if user.birth_day %}
     <h3>Born : {{user.birth_day}}</h3>
@@ -22,10 +22,11 @@ Profile
     <h2> edit your profile </h2>
     <form method="post" action="{% url 'update-profile' user.username %}">
         {% csrf_token %}
-
-        <p> Bio <input type="text" name="bio"> </p>
-        <p>dato of Birth <input type="date" name="birth_day"> </p>
-        <p> location <input type="text" name="location"> </p>
+        <input type="hidden" name="next" value="{{request.path}}">
+        
+        <p> Bio <input type="text" name="bio" value="{{ user.bio }}"> </p>
+        <p>dato of Birth <input type="date" name="birth_day" value="{{ user.birth_day }}"> </p>
+        <p> location <input type="text" name="location" value="{{ user.location }}"> </p>
         <input type="submit" value="edit">
     </form>
     {% else %}
@@ -35,10 +36,13 @@ Profile
         <h1>unfollow</h1>
         <input type="hidden" name="following" value="true">
         <input type="hidden" name="user" value="{{user.pk}}">
+        <input type="hidden" name="next" value="{{request.path}}">
         <input type="submit" value="unfollow">
         {% else %}
         <h1>follow</h1>
         <input type="hidden" name="user" value="{{user.pk}}">
+        <input type="hidden" name="next" value="{{request.path}}">
+
         <input type="submit" value="follow">
         {% endif %}
 
