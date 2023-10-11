@@ -22,7 +22,7 @@ DB_PASS = ""
       docker logs --tail 1000 -f <docker container>
 
 ## features
-1) User have home page a only sees posts from following users
+1) User have home page and they only see posts from following users
 2) users can follow / unfollow eachother
 3) if users like a post they can bookmark it
 4) users can like posts
